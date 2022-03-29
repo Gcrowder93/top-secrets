@@ -11,4 +11,12 @@ describe('secret-scratch routes', () => {
   afterAll(() => {
     pool.end();
   });
+
+  it('signs up a use via POST', async () => {
+    const res = await request(app)
+      .post('/api/v1/users/sessions')
+      .send({ username: 'chase', password: 'password' });
+
+    expect(res.body).toEqual({ id: expect.any(String), username: 'chase' });
+  });
 });
