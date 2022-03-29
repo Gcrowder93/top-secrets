@@ -23,4 +23,19 @@ describe('secret-scratch routes', () => {
       email: 'chase@gmail.com',
     });
   });
+
+  it('signs in an existing user', async () => {
+    const user = await UserService.create({
+      email: 'chase@gmail.com',
+      password: 'password',
+    });
+
+    const res = await request(app)
+      .post('/api/v1/users/session')
+      .send({ email: 'chase@gmail.com', password: 'password' });
+    expect(res.body).toEqual({
+      message: 'Sign in Successful',
+      user,
+    });
+  });
 });
