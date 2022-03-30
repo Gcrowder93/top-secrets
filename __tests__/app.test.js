@@ -38,4 +38,21 @@ describe('secret-scratch routes', () => {
       user,
     });
   });
+
+  it('allows the `user` user to view a list of posts', async () => {
+    const agent = request.agent(app);
+
+    await UserService.create({
+      email: 'user',
+      password: 'user',
+    });
+
+    await UserService.create({
+      email: 'chase@gmail.com',
+      password: 'password',
+    });
+
+    let res = await agent.get('/api/v1/users/secret');
+    expect(res.status).toEqual(401);
+  });
 });
