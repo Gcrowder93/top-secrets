@@ -3,6 +3,7 @@ const setup = require('../data/setup');
 const request = require('supertest');
 const app = require('../lib/app');
 const UserService = require('../lib/services/UserService');
+const { getMaxListeners } = require('../lib/app');
 
 describe('secret-scratch routes', () => {
   beforeEach(() => {
@@ -42,17 +43,42 @@ describe('secret-scratch routes', () => {
   it('allows the `user` user to view a list of posts', async () => {
     const agent = request.agent(app);
 
-    await UserService.create({
-      email: 'user',
-      password: 'user',
-    });
+    // await UserService.create({
+    //   email: 'admin',
+    //   password: 'admin',
+    // });
 
     await UserService.create({
       email: 'chase@gmail.com',
       password: 'password',
     });
 
-    let res = await agent.get('/api/v1/users/secret');
+    let res = await agent.get('/api/v1/posts');
     expect(res.status).toEqual(401);
+
+    await agent
+      .post('/api/v1/users/session')
+      .send({ email: 'chase@gmail.com', password: 'password' });
+    res = await agent.get('/api/v1/posts');
+    expect(res.status).toEqual(200);
+  });
+
+  it('delete logged out user', async () => {
+    const agent = request.agent(app);
+
+    await UserService.create({
+      email: 'chase@gmail.com',
+      password: 'password',
+    });
+
+    await agent
+      .post('/api/v1/users/session')
+      .send({ email: 'chase@gmail.com', password: 'password' });
+
+    const res = await agent.delete('/api/v1/users/session');
+    expect(res.body).toEqual({
+      success: true,
+      message: 'Signed out successfully!',
+    });
   });
 });
