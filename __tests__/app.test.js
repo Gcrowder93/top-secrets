@@ -96,7 +96,7 @@ describe('secret-scratch routes', () => {
     const post = {
       title: 'super secret',
       description: 'this one time, at band camp',
-      created_at: expect.any(Number),
+      createdAt: expect.any(String),
     };
     const res = await request(app).post('/api/v1/posts').send(post);
     expect(res.body).toEqual({
