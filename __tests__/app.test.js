@@ -81,4 +81,27 @@ describe('secret-scratch routes', () => {
       message: 'Signed out successfully!',
     });
   });
+
+  it('allows a signed in user to create posts', async () => {
+    const agent = request.agent(app);
+
+    await UserService.create({
+      email: 'chase@gmail.com',
+      password: 'password',
+    });
+    await agent
+      .post('/api/v1/users/session')
+      .send({ email: 'chase@gmail.com', password: 'password' });
+
+    const post = {
+      title: 'super secret',
+      description: 'this one time, at band camp',
+      created_at: expect.any(Number),
+    };
+    const res = await request(app).post('/api/v1/posts').send(post);
+    expect(res.body).toEqual({
+      id: expect.any(String),
+      ...post,
+    });
+  });
 });
